@@ -2,7 +2,7 @@ About Us
 ========
 
 
-We are from the `Mobile Systems and Networking Group <http://fudan-msn.weebly.com/>`_ at Fudan University. 
+We are from the `DataNET Group <http://fudan-datanet.mysxl.cn/>`_ at Fudan University.
 Our goal is to build a cross-platform library which could be useful for social network analytics.
 Please feel free to email us at zliek.sh@gmail.com.
 
@@ -21,7 +21,7 @@ Please feel free to email us at zliek.sh@gmail.com.
 * `Min Gao <https://mgao.mystrikingly.com/>`_ (Lead)
 * Chenhao Cui
 * `Teddy Xinyuan Chen <https://github.com/tddschn>`_
-* Bodian Ye
+* `Bodian Ye <https://bdye.mysxl.cn/>`_
 
 **Advisors**
 
