@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    easygraph.functions.hypergraph.centrality
+<<<<<<< HEAD
    easygraph.functions.hypergraph.hypergraph_generator
 
 Submodules
@@ -28,6 +29,8 @@ easygraph.functions.hypergraph.hypergraph\_clustering module
    :members:
    :undoc-members:
    :show-inheritance:
+=======
+>>>>>>> refs/remotes/origin/main
 
 Module contents
 ---------------
