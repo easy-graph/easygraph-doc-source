@@ -23,8 +23,8 @@ sys.path.append(os.path.abspath('sphinxext'))
 # -- Project information -----------------------------------------------------
 
 project = 'EasyGraph'
-copyright = '2020-2023, Mobile Systems and Networking Group, Fudan University'
-author = 'Mobile Systems and Networking Group, Fudan University'
+copyright = '2020-2023, DataNET Group, Fudan University'
+author = 'DataNET Group, Fudan University'
 
 # The full version, including alpha/beta/rc tags
 release = '0.2a48'
@@ -38,7 +38,7 @@ release = '0.2a48'
 extensions = [
     'sphinx_rtd_theme',
     'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
+    # 'sphinx.ext.autosummary',
     'sphinx.ext.coverage',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
@@ -46,9 +46,12 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
+
+
     # 'sphinx_gallery.gen_gallery'
-    "numpydoc",
+    # "numpydoc",
 ]
+
 
 
 # The name of the Pygments (syntax highlighting) style to use.
