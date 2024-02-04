@@ -23,7 +23,7 @@ sys.path.append(os.path.abspath('sphinxext'))
 # -- Project information -----------------------------------------------------
 
 project = 'EasyGraph'
-copyright = '2020-2023, DataNET Group, Fudan University'
+copyright = '2020-2024, DataNET Group, Fudan University'
 author = 'DataNET Group, Fudan University'
 
 # The full version, including alpha/beta/rc tags
