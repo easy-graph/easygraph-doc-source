@@ -49,7 +49,7 @@ extensions = [
 
 
     # 'sphinx_gallery.gen_gallery'
-    # "numpydoc",
+    "numpydoc",
 ]
 
 
