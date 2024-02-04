@@ -292,3 +292,13 @@ The PageRank algorithm
 
 - For class methods, calling and parameter passing are the same as python.
 - For module function, easygraph will select specific codes to execute according to the class of the graph.
+
+View the tutorials in Colab.
+-------------------------
+`tutorial1: Two brief tutorials of how to do graph analysis with EasyGraph. <https://colab.research.google.com/drive/1563MGCebT5-EVB-GDMRgCGeXIHRXiJii#scrollTo=zaKmkvGe_j53>`_
+
+`tutorial2: Using C++ code to achieve a better performance. <https://colab.research.google.com/drive/1Ypgjl4kkG7JMLgSVXJovxVVj7fiZlKij>`_
+
+`tutorial3: Graph Embedding. <https://colab.research.google.com/drive/1G3HXIi36d0myVRdbJUCMVA2OJOj4RgP_>`_
+
+`tutorial4: Community Detection. <https://colab.research.google.com/drive/1n7dsZVHlLVUc_4SqK3hwaL8fbEf0sw5V>`_
