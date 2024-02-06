@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
-        <title>easygraph.model.hypergraphs.unignn - EasyGraph 1.0</title>
+        <title>easygraph.functions.path.average_shortest_path_length - EasyGraph 1.1</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/my_theme.css" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../../index.html"><div class="brand">EasyGraph 1.0</div></a>
+      <a href="../../../../index.html"><div class="brand">EasyGraph 1.1</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -149,7 +149,7 @@
     <img class="sidebar-logo" src="../../../../_static/logo.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">EasyGraph 1.0</span>
+  <span class="sidebar-brand-text">EasyGraph 1.1</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -373,221 +373,122 @@
           </label>
         </div>
         <article role="main">
-          <h1>Source code for easygraph.model.hypergraphs.unignn</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+          <h1>Source code for easygraph.functions.path.average_shortest_path_length</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">warnings</span>
 
-<span class="kn">from</span> <span class="nn">easygraph.nn</span> <span class="kn">import</span> <span class="n">MultiHeadWrapper</span>
-<span class="kn">from</span> <span class="nn">easygraph.nn</span> <span class="kn">import</span> <span class="n">UniGATConv</span>
-<span class="kn">from</span> <span class="nn">easygraph.nn</span> <span class="kn">import</span> <span class="n">UniGCNConv</span>
-<span class="kn">from</span> <span class="nn">easygraph.nn</span> <span class="kn">import</span> <span class="n">UniGINConv</span>
-<span class="kn">from</span> <span class="nn">easygraph.nn</span> <span class="kn">import</span> <span class="n">UniSAGEConv</span>
+<span class="kn">import</span> <span class="nn">easygraph</span> <span class="k">as</span> <span class="nn">eg</span>
+
+<span class="kn">from</span> <span class="nn">easygraph.functions.path.path</span> <span class="kn">import</span> <span class="o">*</span>
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;UniGCN&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;UniGAT&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;UniSAGE&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;UniGIN&quot;</span><span class="p">,</span>
-<span class="p">]</span>
+<div class="viewcode-block" id="average_shortest_path_length"><a class="viewcode-back" href="../../../../reference/easygraph.functions.path.html#easygraph.functions.path.average_shortest_path_length.average_shortest_path_length">[docs]</a><span class="k">def</span> <span class="nf">average_shortest_path_length</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the average shortest path length.</span>
 
+<span class="sd">    The average shortest path length is</span>
 
-<div class="viewcode-block" id="UniGCN"><a class="viewcode-back" href="../../../../reference/easygraph.model.hypergraphs.html#easygraph.model.hypergraphs.unignn.UniGCN">[docs]</a><span class="k">class</span> <span class="nc">UniGCN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The UniGCN model proposed in `UniGNN: a Unified Framework for Graph and Hypergraph Neural Networks &lt;https://arxiv.org/pdf/2105.00956.pdf&gt;`_ paper (IJCAI 2021).</span>
+<span class="sd">    .. math::</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        ``in_channels`` (``int``): :math:`C_{in}` is the number of input channels.</span>
-<span class="sd">        ``hid_channels`` (``int``): :math:`C_{hid}` is the number of hidden channels.</span>
-<span class="sd">        ``num_classes`` (``int``): The Number of class of the classification task.</span>
-<span class="sd">        ``use_bn`` (``bool``): If set to ``True``, use batch normalization. Defaults to ``False``.</span>
-<span class="sd">        ``drop_rate`` (``float``, optional): Dropout ratio. Defaults to ``0.5``.</span>
+<span class="sd">       a =\sum_{\substack{s,t \in V \\ s\neq t}} \frac{d(s, t)}{n(n-1)}</span>
+
+<span class="sd">    where `V` is the set of nodes in `G`,</span>
+<span class="sd">    `d(s, t)` is the shortest path from `s` to `t`,</span>
+<span class="sd">    and `n` is the number of nodes in `G`.</span>
+
+<span class="sd">    .. versionchanged:: 3.0</span>
+<span class="sd">       An exception is raised for directed graphs that are not strongly</span>
+<span class="sd">       connected.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    G : EasyGraph graph</span>
+
+<span class="sd">    weight : None, string or function, optional (default = None)</span>
+<span class="sd">        If None, every edge has weight/distance/cost 1.</span>
+<span class="sd">        If a string, use this edge attribute as the edge weight.</span>
+<span class="sd">        Any edge attribute not present defaults to 1.</span>
+<span class="sd">        If this is a function, the weight of an edge is the value</span>
+<span class="sd">        returned by the function. The function must accept exactly</span>
+<span class="sd">        three positional arguments: the two endpoints of an edge and</span>
+<span class="sd">        the dictionary of edge attributes for that edge.</span>
+<span class="sd">        The function must return a number.</span>
+
+<span class="sd">    method : string, optional (default = &#39;unweighted&#39; or &#39;dijkstra&#39;)</span>
+<span class="sd">        The algorithm to use to compute the path lengths.</span>
+<span class="sd">        Supported options are &#39;unweighted&#39;, &#39;dijkstra&#39;, &#39;bellman-ford&#39;,</span>
+<span class="sd">        &#39;floyd-warshall&#39; and &#39;floyd-warshall-numpy&#39;.</span>
+<span class="sd">        Other method values produce a ValueError.</span>
+<span class="sd">        The default method is &#39;unweighted&#39; if `weight` is None,</span>
+<span class="sd">        otherwise the default method is &#39;dijkstra&#39;.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    NetworkXPointlessConcept</span>
+<span class="sd">        If `G` is the null graph (that is, the graph on zero nodes).</span>
+
+<span class="sd">    NetworkXError</span>
+<span class="sd">        If `G` is not connected (or not strongly connected, in the case</span>
+<span class="sd">        of a directed graph).</span>
+
+<span class="sd">    ValueError</span>
+<span class="sd">        If `method` is not among the supported options.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; G = eg.path_graph(5)</span>
+<span class="sd">    &gt;&gt;&gt; eg.average_shortest_path_length(G)</span>
+<span class="sd">    2.0</span>
+
+<span class="sd">    For disconnected graphs, you can compute the average shortest path</span>
+<span class="sd">    length for each component</span>
+
+<span class="sd">    &gt;&gt;&gt; G = eg.Graph([(1, 2), (3, 4)])</span>
+<span class="sd">    &gt;&gt;&gt; for C in (G.subgraph(c).copy() for c in eg.connected_components(G)):</span>
+<span class="sd">    ...     print(eg.average_shortest_path_length(C))</span>
+<span class="sd">    1.0</span>
+<span class="sd">    1.0</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">single_source_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;single_source_bfs&quot;</span><span class="p">,</span> <span class="s2">&quot;Dijkstra&quot;</span><span class="p">]</span>
+    <span class="n">all_pairs_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Floyed&quot;</span><span class="p">]</span>
+    <span class="n">supported_methods</span> <span class="o">=</span> <span class="n">single_source_methods</span> <span class="o">+</span> <span class="n">all_pairs_methods</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">hid_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">use_bn</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">drop_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">UniGCNConv</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">hid_channels</span><span class="p">,</span> <span class="n">use_bn</span><span class="o">=</span><span class="n">use_bn</span><span class="p">,</span> <span class="n">drop_rate</span><span class="o">=</span><span class="n">drop_rate</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;single_source_bfs&quot;</span> <span class="k">if</span> <span class="n">weight</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;dijkstra&quot;</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_methods</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;method not supported: </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="c1"># For the special case of the null graph, raise an exception, since</span>
+    <span class="c1"># there are no paths in the null graph.</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;the null graph has no paths, thus there is no average shortest path length&quot;</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">UniGCNConv</span><span class="p">(</span><span class="n">hid_channels</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">use_bn</span><span class="o">=</span><span class="n">use_bn</span><span class="p">,</span> <span class="n">is_last</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="k">raise</span> <span class="n">eg</span><span class="o">.</span><span class="n">EasyGraphPointlessConcept</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="c1"># For the special case of the trivial graph, return zero immediately.</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="c1"># Shortest path length is undefined if the graph is not strongly connected.</span>
+    <span class="k">if</span> <span class="n">G</span><span class="o">.</span><span class="n">is_directed</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">eg</span><span class="o">.</span><span class="n">is_strongly_connected</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">eg</span><span class="o">.</span><span class="n">EasyGraphError</span><span class="p">(</span><span class="s2">&quot;Graph is not strongly connected.&quot;</span><span class="p">)</span>
+    <span class="c1"># Shortest path length is undefined if the graph is not connected.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">G</span><span class="o">.</span><span class="n">is_directed</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">eg</span><span class="o">.</span><span class="n">is_connected</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">eg</span><span class="o">.</span><span class="n">EasyGraphError</span><span class="p">(</span><span class="s2">&quot;Graph is not connected.&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="UniGCN.forward"><a class="viewcode-back" href="../../../../reference/easygraph.model.hypergraphs.html#easygraph.model.hypergraphs.unignn.UniGCN.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">hg</span><span class="p">:</span> <span class="s2">&quot;eg.Hypergraph&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The forward function.</span>
+    <span class="c1"># Compute all-pairs shortest paths.</span>
+    <span class="k">def</span> <span class="nf">path_length</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;single_source_bfs&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">eg</span><span class="o">.</span><span class="n">single_source_bfs</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;dijkstra&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">eg</span><span class="o">.</span><span class="n">Dijkstra</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">)</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            ``X`` (``torch.Tensor``): Input vertex feature matrix. Size :math:`(N, C_{in})`.</span>
-<span class="sd">            ``hg`` (``eg.Hypergraph``): The hypergraph structure that contains :math:`N` vertices.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
-            <span class="n">X</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">hg</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">X</span></div></div>
-
-
-<div class="viewcode-block" id="UniGAT"><a class="viewcode-back" href="../../../../reference/easygraph.model.hypergraphs.html#easygraph.model.hypergraphs.unignn.UniGAT">[docs]</a><span class="k">class</span> <span class="nc">UniGAT</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The UniGAT model proposed in `UniGNN: a Unified Framework for Graph and Hypergraph Neural Networks &lt;https://arxiv.org/pdf/2105.00956.pdf&gt;`_ paper (IJCAI 2021).</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        ``in_channels`` (``int``): :math:`C_{in}` is the number of input channels.</span>
-<span class="sd">        ``hid_channels`` (``int``): :math:`C_{hid}` is the number of hidden channels.</span>
-<span class="sd">        ``num_classes`` (``int``): The Number of class of the classification task.</span>
-<span class="sd">        ``num_heads`` (``int``): The Number of attention head in each layer.</span>
-<span class="sd">        ``use_bn`` (``bool``): If set to ``True``, use batch normalization. Defaults to ``False``.</span>
-<span class="sd">        ``drop_rate`` (``float``): The dropout probability. Defaults to ``0.5``.</span>
-<span class="sd">        ``atten_neg_slope`` (``float``): Hyper-parameter of the ``LeakyReLU`` activation of edge attention. Defaults to 0.2.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">hid_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">num_heads</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">use_bn</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">drop_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
-        <span class="n">atten_neg_slope</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">drop_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">drop_rate</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">multi_head_layer</span> <span class="o">=</span> <span class="n">MultiHeadWrapper</span><span class="p">(</span>
-            <span class="n">num_heads</span><span class="p">,</span>
-            <span class="s2">&quot;concat&quot;</span><span class="p">,</span>
-            <span class="n">UniGATConv</span><span class="p">,</span>
-            <span class="n">in_channels</span><span class="o">=</span><span class="n">in_channels</span><span class="p">,</span>
-            <span class="n">out_channels</span><span class="o">=</span><span class="n">hid_channels</span><span class="p">,</span>
-            <span class="n">use_bn</span><span class="o">=</span><span class="n">use_bn</span><span class="p">,</span>
-            <span class="n">drop_rate</span><span class="o">=</span><span class="n">drop_rate</span><span class="p">,</span>
-            <span class="n">atten_neg_slope</span><span class="o">=</span><span class="n">atten_neg_slope</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="c1"># The original implementation has applied activation layer after the final layer.</span>
-        <span class="c1"># Thus, we donot set ``is_last`` to ``True``.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">out_layer</span> <span class="o">=</span> <span class="n">UniGATConv</span><span class="p">(</span>
-            <span class="n">hid_channels</span> <span class="o">*</span> <span class="n">num_heads</span><span class="p">,</span>
-            <span class="n">num_classes</span><span class="p">,</span>
-            <span class="n">use_bn</span><span class="o">=</span><span class="n">use_bn</span><span class="p">,</span>
-            <span class="n">drop_rate</span><span class="o">=</span><span class="n">drop_rate</span><span class="p">,</span>
-            <span class="n">atten_neg_slope</span><span class="o">=</span><span class="n">atten_neg_slope</span><span class="p">,</span>
-            <span class="n">is_last</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="p">)</span>
-
-<div class="viewcode-block" id="UniGAT.forward"><a class="viewcode-back" href="../../../../reference/easygraph.model.hypergraphs.html#easygraph.model.hypergraphs.unignn.UniGAT.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">hg</span><span class="p">:</span> <span class="s2">&quot;eg.Hypergraph&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The forward function.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            ``X`` (``torch.Tensor``): Input vertex feature matrix. Size :math:`(N, C_{in})`.</span>
-<span class="sd">            ``hg`` (``eg.Hypergraph``): The hypergraph structure that contains :math:`N` vertices.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_layer</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_head_layer</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">hg</span><span class="o">=</span><span class="n">hg</span><span class="p">)</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_layer</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_layer</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">hg</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">X</span></div></div>
-
-
-<div class="viewcode-block" id="UniSAGE"><a class="viewcode-back" href="../../../../reference/easygraph.model.hypergraphs.html#easygraph.model.hypergraphs.unignn.UniSAGE">[docs]</a><span class="k">class</span> <span class="nc">UniSAGE</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The UniSAGE model proposed in `UniGNN: a Unified Framework for Graph and Hypergraph Neural Networks &lt;https://arxiv.org/pdf/2105.00956.pdf&gt;`_ paper (IJCAI 2021).</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        ``in_channels`` (``int``): :math:`C_{in}` is the number of input channels.</span>
-<span class="sd">        ``hid_channels`` (``int``): :math:`C_{hid}` is the number of hidden channels.</span>
-<span class="sd">        ``num_classes`` (``int``): The Number of class of the classification task.</span>
-<span class="sd">        ``use_bn`` (``bool``): If set to ``True``, use batch normalization. Defaults to ``False``.</span>
-<span class="sd">        ``drop_rate`` (``float``, optional): Dropout ratio. Defaults to ``0.5``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">hid_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">use_bn</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">drop_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">UniSAGEConv</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">hid_channels</span><span class="p">,</span> <span class="n">use_bn</span><span class="o">=</span><span class="n">use_bn</span><span class="p">,</span> <span class="n">drop_rate</span><span class="o">=</span><span class="n">drop_rate</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">UniSAGEConv</span><span class="p">(</span><span class="n">hid_channels</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">use_bn</span><span class="o">=</span><span class="n">use_bn</span><span class="p">,</span> <span class="n">is_last</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="p">)</span>
-
-<div class="viewcode-block" id="UniSAGE.forward"><a class="viewcode-back" href="../../../../reference/easygraph.model.hypergraphs.html#easygraph.model.hypergraphs.unignn.UniSAGE.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">hg</span><span class="p">:</span> <span class="s2">&quot;eg.Hypergraph&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The forward function.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            ``X`` (``torch.Tensor``): Input vertex feature matrix. Size :math:`(N, C_{in})`.</span>
-<span class="sd">            ``hg`` (``eg.Hypergraph``): The hypergraph structure that contains :math:`N` vertices.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
-            <span class="n">X</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">hg</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">X</span></div></div>
-
-
-<div class="viewcode-block" id="UniGIN"><a class="viewcode-back" href="../../../../reference/easygraph.model.hypergraphs.html#easygraph.model.hypergraphs.unignn.UniGIN">[docs]</a><span class="k">class</span> <span class="nc">UniGIN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The UniGIN model proposed in `UniGNN: a Unified Framework for Graph and Hypergraph Neural Networks &lt;https://arxiv.org/pdf/2105.00956.pdf&gt;`_ paper (IJCAI 2021).</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        ``in_channels`` (``int``): :math:`C_{in}` is the number of input channels.</span>
-<span class="sd">        ``hid_channels`` (``int``): :math:`C_{hid}` is the number of hidden channels.</span>
-<span class="sd">        ``num_classes`` (``int``): The Number of class of the classification task.</span>
-<span class="sd">        ``eps`` (``float``): The epsilon value. Defaults to ``0.0``.</span>
-<span class="sd">        ``train_eps`` (``bool``): If set to ``True``, the epsilon value will be trainable. Defaults to ``False``.</span>
-<span class="sd">        ``use_bn`` (``bool``): If set to ``True``, use batch normalization. Defaults to ``False``.</span>
-<span class="sd">        ``drop_rate`` (``float``, optional): Dropout ratio. Defaults to ``0.5``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">hid_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">train_eps</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">use_bn</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">drop_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">UniGINConv</span><span class="p">(</span>
-                <span class="n">in_channels</span><span class="p">,</span>
-                <span class="n">hid_channels</span><span class="p">,</span>
-                <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">,</span>
-                <span class="n">train_eps</span><span class="o">=</span><span class="n">train_eps</span><span class="p">,</span>
-                <span class="n">use_bn</span><span class="o">=</span><span class="n">use_bn</span><span class="p">,</span>
-                <span class="n">drop_rate</span><span class="o">=</span><span class="n">drop_rate</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">UniGINConv</span><span class="p">(</span>
-                <span class="n">hid_channels</span><span class="p">,</span>
-                <span class="n">num_classes</span><span class="p">,</span>
-                <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">,</span>
-                <span class="n">train_eps</span><span class="o">=</span><span class="n">train_eps</span><span class="p">,</span>
-                <span class="n">use_bn</span><span class="o">=</span><span class="n">use_bn</span><span class="p">,</span>
-                <span class="n">is_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-
-<div class="viewcode-block" id="UniGIN.forward"><a class="viewcode-back" href="../../../../reference/easygraph.model.hypergraphs.html#easygraph.model.hypergraphs.unignn.UniGIN.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">hg</span><span class="p">:</span> <span class="s2">&quot;eg.Hypergraph&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The forward function.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            ``X`` (``torch.Tensor``): Input vertex feature matrix. Size :math:`(N, C_{in})`.</span>
-<span class="sd">            ``hg`` (``eg.Hypergraph``): The hypergraph structure that contains :math:`N` vertices.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
-            <span class="n">X</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">hg</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">X</span></div></div>
+    <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">single_source_methods</span><span class="p">:</span>
+        <span class="c1"># Sum the distances for each (ordered) pair of source and target node.</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">l</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">G</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">path_length</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">all_pairs</span> <span class="o">=</span> <span class="n">eg</span><span class="o">.</span><span class="n">Floyed</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">all_pairs</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">s</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span></div>
 </pre></div>
         </article>
       </div>

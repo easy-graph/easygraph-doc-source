@@ -18,7 +18,7 @@ import sys
 
 
 sys.path.append(os.path.abspath('sphinxext'))
-
+sys.path.insert(0,"/Users/yizhihenpidehou/Desktop/fdu/eg/Easy-Graph")
 
 # -- Project information -----------------------------------------------------
 
@@ -27,7 +27,7 @@ copyright = '2020-2024, DataNET Group, Fudan University'
 author = 'DataNET Group, Fudan University'
 
 # The full version, including alpha/beta/rc tags
-release = '1.0'
+release = '1.1'
 
 
 # -- General configuration ---------------------------------------------------
@@ -49,7 +49,7 @@ extensions = [
 
 
     # 'sphinx_gallery.gen_gallery'
-    "numpydoc",
+    # "numpydoc",
 ]
 
 
@@ -93,7 +93,7 @@ html_static_path = ['_static']
 html_logo = "logo.png"
 
 # change the sidebar title
-html_title = "EasyGraph 1.0"
+html_title = "EasyGraph 1.1"
 
 # Add the 'copybutton' javascript, to hide/show the prompt in code examples
 def setup(app):
