@@ -18,7 +18,6 @@ import sys
 
 
 sys.path.append(os.path.abspath('sphinxext'))
-sys.path.insert(0,"/Users/yizhihenpidehou/Desktop/fdu/eg/Easy-Graph")
 
 # -- Project information -----------------------------------------------------
 
