@@ -27,7 +27,7 @@ copyright = '2020-2024, DataNET Group, Fudan University'
 author = 'DataNET Group, Fudan University'
 
 # The full version, including alpha/beta/rc tags
-release = '1.1'
+release = '1.2'
 
 
 # -- General configuration ---------------------------------------------------
@@ -93,7 +93,7 @@ html_static_path = ['_static']
 html_logo = "logo.png"
 
 # change the sidebar title
-html_title = "EasyGraph 1.1"
+html_title = "EasyGraph 1.2"
 
 # Add the 'copybutton' javascript, to hide/show the prompt in code examples
 def setup(app):
