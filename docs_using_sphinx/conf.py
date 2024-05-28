@@ -93,7 +93,7 @@ html_static_path = ['_static']
 html_logo = "logo.png"
 
 # change the sidebar title
-html_title = "EasyGraph 1.2"
+html_title = "EasyGraph 1.3"
 
 # Add the 'copybutton' javascript, to hide/show the prompt in code examples
 def setup(app):
