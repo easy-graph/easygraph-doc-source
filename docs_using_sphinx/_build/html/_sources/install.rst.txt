@@ -3,8 +3,8 @@ Installation
 ============
 
 For Windows, MacOSX, and Linux users, we recommend using Python's 
-package management system, `pip <https://pip.pypa.io/en/stable>`_ .
-You can find EasyGraph on PyPI `here <https://pypi.org/project/Python-EasyGraph/>`_.
+package management system, `pip <https://pip.pypa.io/en/stable>`_, for installation.
+You can find EasyGraph on PyPI at this `link <https://pypi.org/project/Python-EasyGraph/>`_.
 
 **Installation with** ``pip``
 ::
@@ -12,7 +12,7 @@ You can find EasyGraph on PyPI `here <https://pypi.org/project/Python-EasyGraph/
     $ pip install Python-EasyGraph
 
 The package is no longer under maintenance on conda.
-If you've previously installed EasyGraph, please uninstall it with conda and reinstall with pip.
+If you've previously installed EasyGraph with conda, please uninstall it with conda and reinstall with pip.
 If prebuilt EasyGraph wheels are not supported on your platform (OS / CPU arch, check here), you can build it locally as follows:
 
 **Example installation with** ``conda``
@@ -28,6 +28,4 @@ If prebuilt EasyGraph wheels are not supported on your platform (OS / CPU arch, 
     Note that this does not prevent you from running non-machine learning functions 
     if PyTorch is not installed in your environment.
     However, you will receive warnings indicating the unavailability of certain modules that depend on PyTorch.
-
-    
-    
+        
