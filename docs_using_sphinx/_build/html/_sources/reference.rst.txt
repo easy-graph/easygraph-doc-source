@@ -1,4 +1,4 @@
-EasyGraph API
+Reference
 =========
 
 At this point, EasyGraph has integrated a variety of graph computation functions, 
