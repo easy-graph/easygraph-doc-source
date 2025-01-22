@@ -25,11 +25,11 @@ sys.path.append(os.path.abspath('sphinxext'))
 # -- Project information -----------------------------------------------------
 
 project = 'EasyGraph'
-copyright = '2020-2024, DataNET Group, Fudan University'
+copyright = '2020-2025, DataNET Group, Fudan University'
 author = 'DataNET Group, Fudan University'
 
 # The full version, including alpha/beta/rc tags
-release = '1.4'
+release = '1.4.1'
 
 
 # -- General configuration ---------------------------------------------------
@@ -80,10 +80,13 @@ latex_paper_size = "letter"
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 # Themes trying right now: sphinx_rtd_theme, yummy_sphinx_theme, bootstrap - cosmo, flatly, cyborg, furo
-html_theme = 'furo'
-
+html_theme = 'sphinx_rtd_theme'
 # html_theme_options in conf.py is used for customisations that affect the entire documentation. This is for stuff like fonts and colors.
-html_theme_options = {}
+html_theme_options = {
+'style_nav_header_background': 'white',
+'navigation_depth': 1
+
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
