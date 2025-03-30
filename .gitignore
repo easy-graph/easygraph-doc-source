@@ -1,4 +1,5 @@
 docs_using_sphinx/dev/*.html
+docs_using_sphinx/env
 log
 .env
 _build/*
