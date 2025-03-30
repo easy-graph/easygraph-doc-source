@@ -4,6 +4,9 @@ log
 .env
 _build/*
 */.env/*
+docs_using_sphinx/_build/doctrees/env/*
+docs_using_sphinx/_build/html/_sources/env/*
+docs_using_sphinx/_build/html/env/*
 # vscode
 *.tmp
 .build/
