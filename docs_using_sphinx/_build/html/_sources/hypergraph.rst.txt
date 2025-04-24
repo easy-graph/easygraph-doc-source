@@ -5,10 +5,39 @@ Overview
 +++++++++++++
 
 We present a comprehensive, computation-effective, and storage-saving hypergraph library designed not only for in-depth hypergraph analysis but also for the growing field of hypergraph learning. The library, called EasyHypergraph, allows users from multiple disciplines to input hypergraph data, efficiently perform hypergraph analysis or hypergraph learning tasks on large-scale datasets by utilizing computational workflow, and gain insights from higher-order structures. EasyHypergraph’s broad capabilities and computational efficiency empower researchers and practitioners from various fields to effectively harness the potential of higher-order networks, sparking innovative solutions for practical problems.
-Its architecture is shown as follows:
+Its architecture is shown as follows: 
 
 .. image:: function_dynamic.png
 
+
+Correlation with EasyGraph
++++++++++++++
+
+EasyHypergraph bridges the gap between EasyGraph and higher-order relationships. EasyHypergraph is developed as an integrated library within the EasyGraph framework, maintaining full compatibility with its core architecture.
+Specifically, one hypergraph modeled by EasyHypergraph can be projected into a simple graph in EasyGraph by hypergraph projection algorithms. Then, users can utilize the algorithms associated with simple graphs in EasyGraph for further exploration without relying on external libraries.
+
+Installation
++++++++++++++
+
+Please refer to the installation of `EasyGraph <https://easy-graph.github.io/docs/install.html>`_
+
+Documentation
++++++++++++++
+
+- Hypergraph class 
+    - :ref:`module_easygraph.classes.hypergraph`
+- Hypergraph projection algorithms
+    - :ref:`module_easygraph.functions.hypergraph.projection`
+- Hypergraph datasets 
+    - :ref:`module_easygraph.datasets.hypergraph`
+- Hypergraph analysis
+    - :ref:`hypergraph assortativity <module_easygraph.functions.hypergraph.assortativity>`
+    - :ref:`module_easygraph.functions.hypergraph`
+- Hypergraph learning 
+    - :ref:`module_easygraph.model.hypergraphs` 
+    - :ref:`module_easygraph.nn`
+- Hypergraph visualization
+    - :ref:`module_easygraph.functions.drawing`
 
 Examples
 +++++++++++++

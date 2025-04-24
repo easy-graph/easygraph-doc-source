@@ -20,7 +20,7 @@ import sys
 sys.path.append(os.path.abspath('sphinxext'))
 #sys.path.append(os.path.abspath('/users/Min/Easy-Graph'))
 #sys.path.insert(0,"/users/Min/Easy-Graph")
-# sys.path.insert(0,"/Users/yizhihenpidehou/Desktop/fdu/eg/Easy-Graph")
+sys.path.insert(0,"/Users/yizhihenpidehou/Desktop/fdu/eg/Easy-Graph")
 
 # -- Project information -----------------------------------------------------
 
@@ -40,7 +40,7 @@ release = '1.4.1'
 extensions = [
     'sphinx_rtd_theme',
     'sphinx.ext.autodoc',
-    # 'sphinx.ext.autosummary',
+    'sphinx.ext.autosummary',
     'sphinx.ext.coverage',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
@@ -51,7 +51,7 @@ extensions = [
 
 
     # 'sphinx_gallery.gen_gallery'
-    # "numpydoc",
+    "numpydoc",
 ]
 
 
@@ -98,7 +98,7 @@ html_static_path = ['_static']
 html_logo = "logo.png"
 
 # change the sidebar title
-html_title = "EasyGraph 1.4"
+html_title = "EasyGraph 1.4.1"
 
 # Add the 'copybutton' javascript, to hide/show the prompt in code examples
 def setup(app):
