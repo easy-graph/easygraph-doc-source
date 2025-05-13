@@ -9,8 +9,9 @@ def add_labels_to_rst_files(rst_dir):
                 label = f'.. _module_{module_name}:\n\n'
                 with open(file_path, 'r+') as f:
                     content = f.read()
-                    f.seek(0, 0)
-                    f.write(label + content)
+                    if content.find(label) != -1:
+                        f.seek(0, 0)
+                        f.write(label + content)
 
 if __name__ == "__main__":
     rst_directory = './reference'  # 替换为实际的 .rst 文件目录

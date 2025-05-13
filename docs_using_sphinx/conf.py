@@ -48,12 +48,9 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
-
-
     # 'sphinx_gallery.gen_gallery'
     "numpydoc",
 ]
-
 
 
 # The name of the Pygments (syntax highlighting) style to use.
@@ -80,12 +77,25 @@ latex_paper_size = "letter"
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 # Themes trying right now: sphinx_rtd_theme, yummy_sphinx_theme, bootstrap - cosmo, flatly, cyborg, furo
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'pydata_sphinx_theme'
 # html_theme_options in conf.py is used for customisations that affect the entire documentation. This is for stuff like fonts and colors.
 html_theme_options = {
 'style_nav_header_background': 'white',
-'navigation_depth': 1
-
+'navigation_depth': 1,
+# 'display_version': True,
+"navbar_end": ["navbar-icon-links"],  # 确保 icon link 显示在右侧
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/easy-graph/Easy-Graph",
+            "icon": "fab fa-github",  # Font Awesome 的 GitHub 图标
+            "type": "fontawesome",
+            "attributes": {
+                "title": "Source repository",  # 鼠标悬停时显示的文字
+            },
+        },
+    ],
+"github_repo": "https://github.com/easy-graph/Easy-Graph",
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

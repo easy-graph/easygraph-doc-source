@@ -51,6 +51,15 @@ make gen-rst
 - Install dependencies in `requirements.txt`.
 - Run ` make html`. The updated pages locate in `./_build/html`.
 
+## Cross-reference
+
+You can refer to the /docs_using_sphinx/hypergraph.rst or following steps.
+
+1. Label the .rst in /reference by running rst_label.py manually.
+2. Add cross-reference in your target .rst manually.
+3. Build HTML from `rst` files refer to the previous step.
+
+
 ## Deploy to easy-graph.github.io
 
 - Sync all the files under `./_build/html` to repository `easy-graph.github.io`:

@@ -4,7 +4,7 @@ EasyHypergraph
 Overview
 +++++++++++++
 
-*EasyHypergraph** is a comprehensive, computation-effective, and storage-saving hypergraph computation tool designed not only for in-depth hypergraph analysis but also for the growing field of hypergraph learning. 
+**EasyHypergraph** is a comprehensive, computation-effective, and storage-saving hypergraph computation tool designed not only for in-depth hypergraph analysis but also for the growing field of hypergraph learning.
 It bridges the gap between EasyGraph and higher-order relationships. EasyHypergraph is developed as an integrated module within the EasyGraph framework, maintaining full compatibility with its core architecture.
 
 Its architecture is shown as follows: 
@@ -26,18 +26,13 @@ Please refer to the installation of `EasyGraph <https://easy-graph.github.io/doc
 Documentation
 +++++++++++++
 
-- Hypergraph class definition, properties and projection algorithms 
-    - :ref:`module_easygraph.classes.hypergraph`
-- Hypergraph datasets module
-    - :ref:`module_easygraph.datasets.hypergraph`
-- Hypergraph analysis module
-    - :ref:`hypergraph assortativity <module_easygraph.functions.hypergraph.assortativity>`
-    - :ref:`module_easygraph.functions.hypergraph`
+- :ref:`Hypergraph class definition, properties and projection algorithms <module_easygraph.classes.hypergraph>`
+- :ref:`Hypergraph datasets module <module_easygraph.datasets.hypergraph>`
+- :ref:`Hypergraph analysis module <module_easygraph.functions.hypergraph>`
 - Hypergraph learning module
-    - :ref:`module_easygraph.model.hypergraphs` 
-    - :ref:`module_easygraph.nn`
-- Hypergraph visualization module
-    - :ref:`module_easygraph.functions.drawing`
+    - :ref:`EasyHypergraph neural network models <module_easygraph.model.hypergraphs>`
+    - :ref:`EasyHypergraph neural network convolutional layers <module_easygraph.nn.convs.hypergraphs>`
+- :ref:`Hypergraph visualization module <module_easygraph.functions.drawing.drawing>`
 
 Examples
 +++++++++++++
@@ -174,7 +169,7 @@ trivago-clicks (eg.trivago_clicks):
 Sets of hotels clicked on in a Web browsing session, where labels are the countries of the accommodation.
 
 
-**Import Libraries:**
+**Import libraries:**
 
 .. code-block:: python
 
