@@ -24,19 +24,17 @@ Please refer to the installation of `EasyGraph <https://easy-graph.github.io/doc
 Documentation
 +++++++++++++
 
-- Hypergraph class 
+- Hypergraph class definition, properties and projection algorithms 
     - :ref:`module_easygraph.classes.hypergraph`
-- Hypergraph projection algorithms
-    - :ref:`module_easygraph.functions.hypergraph.projection`
-- Hypergraph datasets 
+- Hypergraph datasets module
     - :ref:`module_easygraph.datasets.hypergraph`
-- Hypergraph analysis
+- Hypergraph analysis module
     - :ref:`hypergraph assortativity <module_easygraph.functions.hypergraph.assortativity>`
     - :ref:`module_easygraph.functions.hypergraph`
-- Hypergraph learning 
+- Hypergraph learning module
     - :ref:`module_easygraph.model.hypergraphs` 
     - :ref:`module_easygraph.nn`
-- Hypergraph visualization
+- Hypergraph visualization module
     - :ref:`module_easygraph.functions.drawing`
 
 Examples
