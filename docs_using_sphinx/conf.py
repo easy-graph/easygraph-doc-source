@@ -20,7 +20,7 @@ import sys
 sys.path.append(os.path.abspath('sphinxext'))
 #sys.path.append(os.path.abspath('/users/Min/Easy-Graph'))
 #sys.path.insert(0,"/users/Min/Easy-Graph")
-sys.path.insert(0,"/Users/yizhihenpidehou/Desktop/fdu/eg/Easy-Graph")
+# sys.path.insert(0,"/Users/yizhihenpidehou/Desktop/fdu/eg/Easy-Graph")
 
 # -- Project information -----------------------------------------------------
 
