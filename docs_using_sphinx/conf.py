@@ -3,8 +3,8 @@
 import os
 import sys
 sys.path.append(os.path.abspath('sphinxext'))
-# 如果你还想把源码目录也加进来，类似这样：
-# sys.path.insert(0, os.path.abspath('../Easy-Graph'))
+# 添加源码目录到Python路径
+sys.path.insert(0, os.path.abspath('../../Easy-Graph'))
 
 # -- Project information -----------------------------------------------------
 
@@ -35,6 +35,18 @@ autosummary_generate = True
 # 如果你的代码里 import 了但文档环境缺失的第三方库，就在这里 mock 掉
 autodoc_mock_imports = [
     "torch_geometric",
+    "torch",
+    "torch_scatter",
+    "torch_sparse", 
+    "cpp_easygraph",  # 添加C++扩展模块
+    "seaborn",
+    "matplotlib",
+    "networkx",
+    "sklearn",       # 添加scikit-learn
+    "pandas",        # 添加pandas
+    "optuna",        # 添加optuna
+    "numpy",
+    "scipy",
     # 添加其他可能 import 失败的包
 ]
 
