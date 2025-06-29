@@ -1,46 +1,24 @@
-# source_suffix = ['.rst', '.md', '.html']
-
-# Configuration file for the Sphinx documentation builder.
-#
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
-
 # -- Path setup --------------------------------------------------------------
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#
 import os
 import sys
-
-
-
 sys.path.append(os.path.abspath('sphinxext'))
-#sys.path.append(os.path.abspath('/users/Min/Easy-Graph'))
-#sys.path.insert(0,"/users/Min/Easy-Graph")
-# sys.path.insert(0,"/Users/yizhihenpidehou/Desktop/fdu/eg/Easy-Graph")
+# 如果你还想把源码目录也加进来，类似这样：
+# sys.path.insert(0, os.path.abspath('../Easy-Graph'))
 
 # -- Project information -----------------------------------------------------
 
 project = 'EasyGraph'
 copyright = '2020-2025, DataNET Group, Fudan University'
 author = 'DataNET Group, Fudan University'
-
-# The full version, including alpha/beta/rc tags
 release = '1.4.1'
-
 
 # -- General configuration ---------------------------------------------------
 
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# ones.
 extensions = [
     'sphinx_rtd_theme',
     'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
+    'sphinx.ext.autosummary',   # 用来自动生成 API stub
     'sphinx.ext.coverage',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
@@ -48,69 +26,54 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
-    # 'sphinx_gallery.gen_gallery'
-    "numpydoc",
+    # 'numpydoc',  # 暂时注释掉，避免版本冲突
 ]
 
+# 自动为 autosummary 生成 stub 文件，执行 make html 前先运行一次 sphinx-autogen 或者在 CI 里直接打开
+autosummary_generate = True
 
-# The name of the Pygments (syntax highlighting) style to use.
-# pygments_style = 'friendly'
-pygments_style = "sphinx"
+# 如果你的代码里 import 了但文档环境缺失的第三方库，就在这里 mock 掉
+autodoc_mock_imports = [
+    "torch_geometric",
+    # 添加其他可能 import 失败的包
+]
 
-# Add any paths that contain templates here, relative to this directory.
+# 屏蔽一些常见的警告
+suppress_warnings = [
+    "autosummary.stub",    # stub file not found
+    "ref.undefined",       # 未定义的标签
+    "ref.duplicated",      # 重复的引用目标
+    "autodoc.import",      # import 模块失败
+]
+
 templates_path = ['_templates']
-
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '*test*.rst']
-
-# Options for LaTeX output
-# ------------------------
-# Use a latex engine that allows for unicode characters in docstrings
-latex_engine = "xelatex"
-# The paper size ('letter' or 'a4').
-latex_paper_size = "letter"
 
 # -- Options for HTML output -------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-# Themes trying right now: sphinx_rtd_theme, yummy_sphinx_theme, bootstrap - cosmo, flatly, cyborg, furo
 html_theme = 'pydata_sphinx_theme'
-# html_theme_options in conf.py is used for customisations that affect the entire documentation. This is for stuff like fonts and colors.
 html_theme_options = {
-'style_nav_header_background': 'white',
-'navigation_depth': 1,
-# 'display_version': True,
-"navbar_end": ["navbar-icon-links"],  # 确保 icon link 显示在右侧
+    'style_nav_header_background': 'white',
+    'navigation_depth': 1,
+    "navbar_end": ["navbar-icon-links"],
     "icon_links": [
         {
             "name": "GitHub",
             "url": "https://github.com/easy-graph/Easy-Graph",
-            "icon": "fab fa-github",  # Font Awesome 的 GitHub 图标
+            "icon": "fab fa-github",
             "type": "fontawesome",
-            "attributes": {
-                "title": "Source repository",  # 鼠标悬停时显示的文字
-            },
+            "attributes": {"title": "Source repository"},
         },
     ],
-"github_repo": "https://github.com/easy-graph/Easy-Graph",
+    "github_repo": "https://github.com/easy-graph/Easy-Graph",
 }
 
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
-# html_extra_path = ['tutorial.html']
-
-# add your project’s logo in the documentation
 html_logo = "logo.png"
-
-# change the sidebar title
 html_title = "EasyGraph 1.4.1"
+latex_engine = "xelatex"
+latex_paper_size = "letter"
 
-# Add the 'copybutton' javascript, to hide/show the prompt in code examples
 def setup(app):
     app.add_js_file("copybutton.js")
     app.add_css_file('my_theme.css')
